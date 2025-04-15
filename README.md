@@ -46,20 +46,10 @@ Once everything is set up:
 python training.py
 ```
 
-Make sure to modify any training parameters inside `train.py` or a config file if provided.
-
----
-
-## 📁 Project Structure
-
+after that, use
+```bash
+python predict.py
 ```
-├── data/                 # Dataset of code pairs
-├── models/               # Saved models and checkpoints
-├── train.py              # Main training loop
-├── requirements.txt      # Project dependencies
-└── README.md             # This file
-```
-
 ---
 
 ## 📌 Notes
