@@ -14,7 +14,7 @@ import warnings
 import matplotlib.pyplot as plt
 import logging
 import numpy as np
-from sklearn.metrics import accuracy_score, f1_score
+from sklearn.metrics import accuracy_score, f1_score, precision_score, recall_score
 
 logging.disable(logging.WARNING)
 
@@ -77,36 +77,83 @@ class CloneDetectionDataset(Dataset):
 def compute_metrics(eval_pred):
     logits, labels = eval_pred
     preds = np.argmax(logits, axis=-1)
+
     acc = accuracy_score(labels, preds)
     f1 = f1_score(labels, preds)
-    return {"accuracy": acc, "f1": f1}
+    precision = precision_score(labels, preds)
+    recall = recall_score(labels, preds)
+
+    return {
+        "accuracy": acc,
+        "f1": f1,
+        "precision": precision,
+        "recall": recall,
+    }
 
 def plot_metrics(trainer):
     logs = trainer.state.log_history
+
+    # Extract metrics
     train_loss = [log["loss"] for log in logs if "loss" in log]
+    eval_loss = [log["eval_loss"] for log in logs if "eval_loss" in log]
     eval_acc = [log["eval_accuracy"] for log in logs if "eval_accuracy" in log]
+    f1 = [log["eval_f1"] for log in logs if "eval_f1" in log]
+    learning_rate = [log["learning_rate"] for log in logs if "learning_rate" in log]
+
+    # x-axis indexes
+    train_steps = [i for i, log in enumerate(logs) if "loss" in log]
     eval_steps = [i for i, log in enumerate(logs) if "eval_accuracy" in log]
+    lr_steps = [i for i, log in enumerate(logs) if "learning_rate" in log]
 
-    plt.figure(figsize=(12, 5))
-
-    # Training loss plot
-    plt.subplot(1, 2, 1)
-    plt.plot(train_loss, label="Train Loss")
+    # Plot 1: Training Loss
+    plt.figure()
+    plt.plot(train_steps, train_loss, label="Train Loss")
     plt.title("Training Loss")
     plt.xlabel("Training Step")
     plt.ylabel("Loss")
     plt.legend()
+    plt.savefig("plot_train_loss.png")
+    plt.close()
 
-    # Evaluation accuracy plot
-    plt.subplot(1, 2, 2)
+    # Plot 2: Evaluation Accuracy
+    plt.figure()
     plt.plot(eval_steps, eval_acc, label="Eval Accuracy", color="green")
     plt.title("Evaluation Accuracy")
     plt.xlabel("Eval Step")
     plt.ylabel("Accuracy")
     plt.legend()
+    plt.savefig("plot_eval_accuracy.png")
+    plt.close()
 
-    plt.tight_layout()
-    plt.savefig("training_metrics.png")
+    # Plot 3: Evaluation Loss
+    plt.figure()
+    plt.plot(eval_steps, eval_loss, label="Eval Loss", color="orange")
+    plt.title("Evaluation Loss")
+    plt.xlabel("Eval Step")
+    plt.ylabel("Loss")
+    plt.legend()
+    plt.savefig("plot_eval_loss.png")
+    plt.close()
+
+    # Plot 4: F1 Score
+    plt.figure()
+    plt.plot(eval_steps, f1, label="F1 Score", color="blue")
+    plt.title("F1 Score")
+    plt.xlabel("Eval Step")
+    plt.ylabel("F1 Score")
+    plt.legend()
+    plt.savefig("plot_f1_score.png")
+    plt.close()
+
+    # Plot 5: Learning Rate
+    plt.figure()
+    plt.plot(lr_steps, learning_rate, label="Learning Rate", color="purple")
+    plt.title("Learning Rate")
+    plt.xlabel("Step")
+    plt.ylabel("LR")
+    plt.legend()
+    plt.savefig("plot_learning_rate.png")
+    plt.close()
 
 def main():
     print("CUDA available:", torch.cuda.is_available())
