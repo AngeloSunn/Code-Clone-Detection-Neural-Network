@@ -13,6 +13,14 @@ git clone https://github.com/your-username/Code-Clone-Classifier-Neural-Network.
 cd Code-Clone-Classifier-Neural-Network
 ```
 
+Download TrainigData: 
+https://upload.uni-jena.de/data/68244f0a2b2ee3.83254283/Data9010CDLH.zip
+unzip into Data9010CDLH/
+
+Download BigCloneBench:
+https://onedrive.live.com/?redeem=aHR0cHM6Ly8xZHJ2Lm1zL3UvcyFBaFhiTTZNS3RfeUxqX3RrMjlHSm5jOUJLb0l2Q2c%5FZT1vVlRWSm0&cid=8BFCB70AA333DB15&id=8BFCB70AA333DB15%21261604&parId=8BFCB70AA333DB15%21260467&o=OneUp
+untar into BigCloneBench/
+
 ### 2. Set Up a Python Virtual Environment
 
 > Requires Python 3.8+
