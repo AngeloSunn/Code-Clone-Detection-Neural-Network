@@ -92,10 +92,10 @@ def build_trainer(cfg: ExperimentConfig):
     set_seed(cfg.seed)
     torch.backends.cudnn.benchmark = True
 
-    print("CUDA available:", torch.cuda.is_available())
-    print("bf16 available:", detect_bf16())
+    use_bf16 = detect_bf16()
 
-    prepare_output_dir(cfg.trainer.output_dir)
+    print("CUDA available:", torch.cuda.is_available())
+    print("bf16 available:", use_bf16)
 
     tokenizer = AutoTokenizer.from_pretrained(cfg.model.pretrained_model_name)
     model_config = AutoConfig.from_pretrained(
@@ -110,7 +110,7 @@ def build_trainer(cfg: ExperimentConfig):
     train_dataset, eval_dataset, test_dataset = build_datasets(cfg, tokenizer)
 
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer, pad_to_multiple_of=8)
-    use_bf16 = detect_bf16()
+
     report_to = ["tensorboard"] if cfg.trainer.report_to_tensorboard else []
 
     training_args = TrainingArguments(
@@ -156,6 +156,8 @@ def build_trainer(cfg: ExperimentConfig):
 
 def main(cfg: ExperimentConfig | None = None):
     cfg = cfg or ExperimentConfig()
+    prepare_output_dir(cfg.trainer.output_dir)
+
     trainer, tokenizer, test_dataset = build_trainer(cfg)
 
     trainer.train()
