@@ -30,6 +30,7 @@ from training.utils import (
     silence_transformers_warnings,
 )
 
+from typing import Optional
 
 def prepare_output_dir(path: str):
     if os.path.exists(path):
@@ -154,7 +155,7 @@ def build_trainer(cfg: ExperimentConfig):
     return trainer, tokenizer, test_dataset
 
 
-def main(cfg: ExperimentConfig | None = None):
+def main(cfg: Optional[ExperimentConfig] = None):
     cfg = cfg or ExperimentConfig()
     prepare_output_dir(cfg.trainer.output_dir)
 

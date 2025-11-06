@@ -1,6 +1,6 @@
 # reorder_label.py
-input_file = "datasets/training_data_500k_50k_50k/dev.csv"
-output_file = "datasets/training_data_500k_50k_50k/dev2.csv"
+input_file = "datasets/training_data_full/dev.csv"
+output_file = "datasets/training_data_full/dev2.csv"
 
 with open(input_file, "r") as fin, open(output_file, "w") as fout:
     for line in fin:
