@@ -17,7 +17,7 @@ class CodeSnippetFetcher:
             with open(path, "r", encoding="utf-8", errors="ignore") as file:
                 lines = file.readlines()
         except FileNotFoundError:
-            # Mirror old behaviour: return empty snippet when file is missing.
+            # mirror old behaviour: return empty snippet when file is missing.
             return []
         if self.cache_files_in_memory:
             self._file_cache[path] = lines

@@ -33,7 +33,7 @@ def read_unlabeled_pairs(csv_path):
         reader = csv.reader(f)
         header = next(reader, None)
         for row in reader:
-            pair = tuple(row[:-1])
+            pair = tuple(row[:])
             pairs.append(pair)
     return pairs
 

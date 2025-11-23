@@ -49,7 +49,7 @@ class CodePreprocessor:
                 scope_type_rename=self.config.scope_type_rename,
             )
         except Exception:
-            # Preserve original snippet if normalizer fails (e.g., optional deps missing).
+            # preserve original snippet if normalizer fails (e.g., optional deps missing)
             return code
 
     def process_pair(self, left: str, right: str) -> Tuple[str, str]:

@@ -23,7 +23,7 @@ import warnings
 from dataclasses import dataclass
 from typing import Dict
 
-# ---------------- Whitespace ----------------
+# whitespace
 def normalize_whitespace(text: str) -> str:
     text = text.replace("\r\n", "\n").replace("\r", "\n")
     text = text.replace("\t", "    ")
@@ -31,21 +31,21 @@ def normalize_whitespace(text: str) -> str:
     text = re.sub(r"\n{3,}", "\n\n", text)
     return (text.strip() + ("\n" if text.strip() else ""))
 
-# ---------------- Comments ----------------
+# comments
 _LINE = re.compile(r"//.*?$", re.M)
 _BLOCK = re.compile(r"/\*.*?\*/", re.S)
 
 def remove_comments_java(text: str) -> str:
-    # Replace block comments with spaces of equal length to preserve offsets if needed.
+    # replace block comments with spaces of equal length to preserve offsets if needed
     def _repl_blocks(m): return " " * (m.end() - m.start())
     text = _BLOCK.sub(_repl_blocks, text)
     text = _LINE.sub("", text)
     return text
 
-# ---------------- Literals ----------------
+# literals
 _STR_RX = re.compile(r"(\"(?:\\.|[^\"\\])*\")|('(?:\\.|[^'\\])*')", re.S)
 
-# Java numeric literals incl. hex floats and suffixes; underscores allowed.
+# java numeric literals incl. hex floats and suffixes; underscores allowed
 _NUM_RX = re.compile(
     r"""
     \b(
@@ -65,7 +65,7 @@ def normalize_literals_java(text: str, *, mask_strings: bool = True, mask_number
         text = _NUM_RX.sub("<NUM>", text)
     return text
 
-# ---------------- Scope + Type renaming (tree-sitter) ----------------
+# scope + type renaming (tree-sitter)
 @dataclass
 class _Span:
     start: int
@@ -98,7 +98,7 @@ def _ensure_parser():
     try:
         lang = get_language("java")
     except Exception:
-        # tree_sitter>=0.25 removed the (path, name) initializer; fall back to manual loading.
+        # tree_sitter>=0.25 removed the (path, name) initializer; fall back to manual loading
         lang = None
     if lang is None:
         import ctypes
@@ -130,7 +130,7 @@ def _node_text(src_bytes: bytes, node) -> str:
 def _type_name(src: bytes, type_node) -> str:
     if type_node is None:
         return "obj"
-    # Flatten array types to "base[]"
+    # flatten array types to "base[]"
     if type_node.type == "array_type":
         base = _type_name(src, type_node.child_by_field_name("element"))
         return base + "[]"
@@ -217,7 +217,7 @@ def _collect_scope_maps(src: bytes, root):
     return scopes
 
 def _collect_identifier_occurrences(src: bytes, root, scopes):
-    # Replace only identifiers that are inside a method's span and present in that scope map.
+    # replace only identifiers that are inside a method's span and present in that scope map
     reps = []
 
     def _is_field_member(node) -> bool:
@@ -233,7 +233,7 @@ def _collect_identifier_occurrences(src: bytes, root, scopes):
     def _walk(n):
         if n.type == "identifier":
             if _is_field_member(n):
-                # Skip identifiers that are clearly fields (e.g., this.foo or obj.foo).
+                # skip identifiers that are clearly fields
                 return
             name = _node_text(src, n)
             s, e = n.start_byte, n.end_byte
@@ -265,7 +265,7 @@ def scope_type_variable_normalize_java(code: str) -> str:
         out[s:e] = val.encode("utf-8")
     return out.decode("utf-8", "ignore")
 
-# ---------------- Public API ----------------
+# public api
 def normalize_java_source(
     code: str,
     *,
@@ -277,7 +277,7 @@ def normalize_java_source(
     text = normalize_whitespace(code)
     if strip_comments:
         text = remove_comments_java(text)
-    # Important: rename before literal masking to keep valid Java for the parser.
+    # rename before literal masking to keep valid Java for the parser
     if scope_type_rename:
         try:
             text = scope_type_variable_normalize_java(text)
@@ -288,7 +288,7 @@ def normalize_java_source(
     text = normalize_whitespace(text)
     return text
 
-# ---------------- CLI ----------------
+# cli
 if __name__ == "__main__":
     import argparse, sys
     ap = argparse.ArgumentParser(description="Normalize Java source code.")
